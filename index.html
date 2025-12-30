@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SushiTools Staff Apps</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #0d0208;
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --card-border: rgba(255, 105, 180, 0.15);
+            --pink-glow: #ff2d95;
+            --pink-light: #ff6bb3;
+            --pink-soft: #ffb6d9;
+            --pink-pale: #ffd9eb;
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.6);
+            --input-bg: rgba(255, 255, 255, 0.05);
+            --input-border: rgba(255, 105, 180, 0.2);
+            --input-focus: rgba(255, 45, 149, 0.4);
+        }
+
+        body {
+            font-family: 'Bricolage Grotesque', sans-serif;
+            background: var(--bg-dark);
+            min-height: 100vh;
+            color: var(--text-primary);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(ellipse 80% 50% at 50% -20%, rgba(255, 45, 149, 0.15), transparent),
+                radial-gradient(ellipse 60% 40% at 100% 100%, rgba(255, 107, 179, 0.1), transparent),
+                radial-gradient(ellipse 40% 30% at 0% 80%, rgba(255, 45, 149, 0.08), transparent);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .noise {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 1;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+        }
+
+        .floating-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .float-item {
+            position: absolute;
+            font-size: 2rem;
+            opacity: 0.1;
+            animation: floatAround 30s infinite linear;
+        }
+
+        .float-item:nth-child(1) { top: 10%; left: 5%; animation-delay: 0s; }
+        .float-item:nth-child(2) { top: 60%; left: 85%; animation-delay: -5s; font-size: 1.5rem; }
+        .float-item:nth-child(3) { top: 80%; left: 10%; animation-delay: -10s; font-size: 2.5rem; }
+        .float-item:nth-child(4) { top: 20%; left: 90%; animation-delay: -15s; }
+        .float-item:nth-child(5) { top: 40%; left: 3%; animation-delay: -20s; font-size: 1.8rem; }
+        .float-item:nth-child(6) { top: 90%; left: 70%; animation-delay: -25s; font-size: 1.3rem; }
+
+        @keyframes floatAround {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(20px, -30px) rotate(5deg); }
+            50% { transform: translate(-10px, 20px) rotate(-3deg); }
+            75% { transform: translate(15px, 10px) rotate(3deg); }
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 60px 24px 80px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .logo-wrapper {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, rgba(255, 45, 149, 0.2), rgba(255, 107, 179, 0.1));
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            border-radius: 28px;
+            margin-bottom: 28px;
+            position: relative;
+            animation: logoFloat 4s ease-in-out infinite;
+        }
+
+        .logo-wrapper::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: linear-gradient(135deg, var(--pink-glow), var(--pink-light), var(--pink-glow));
+            border-radius: 30px;
+            z-index: -1;
+            opacity: 0.5;
+            filter: blur(15px);
+            animation: glowPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        @keyframes glowPulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+
+        .logo-emoji {
+            font-size: 3rem;
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 8vw, 3.5rem);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #fff 0%, var(--pink-soft) 50%, var(--pink-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .tagline {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--pink-light);
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            font-weight: 500;
+        }
+
+        .form-container {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 48px 40px;
+            backdrop-filter: blur(40px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .form-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 105, 180, 0.5), transparent);
+        }
+
+        .form-intro {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .form-intro h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .form-intro p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .question-block {
+            margin-bottom: 32px;
+        }
+
+        .question-label {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+
+        .q-number {
+            flex-shrink: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--pink-glow), var(--pink-light));
+            border-radius: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #fff;
+            box-shadow: 0 4px 15px -3px rgba(255, 45, 149, 0.4);
+        }
+
+        .q-text {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            line-height: 1.5;
+            padding-top: 4px;
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 14px;
+            padding: 16px 20px;
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-size: 1rem;
+            color: var(--text-primary);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            resize: none;
+        }
+
+        input[type="text"]:hover,
+        textarea:hover {
+            border-color: rgba(255, 105, 180, 0.35);
+            background: rgba(255, 255, 255, 0.07);
+        }
+
+        input[type="text"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--pink-glow);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 4px var(--input-focus), 0 0 30px -5px rgba(255, 45, 149, 0.3);
+        }
+
+        input[type="text"]::placeholder,
+        textarea::placeholder {
+            color: rgba(255, 255, 255, 0.25);
+        }
+
+        textarea {
+            min-height: 120px;
+            line-height: 1.6;
+        }
+
+        .textarea-small {
+            min-height: 80px;
+        }
+
+        .submit-section {
+            margin-top: 44px;
+            padding-top: 32px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 20px 32px;
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+            background: linear-gradient(135deg, var(--pink-glow), #ff1a88);
+            border: none;
+            border-radius: 16px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 30px -8px rgba(255, 45, 149, 0.5);
+        }
+
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, #ff1a88, var(--pink-glow));
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 16px 40px -8px rgba(255, 45, 149, 0.6);
+        }
+
+        .submit-btn:hover::before {
+            opacity: 1;
+        }
+
+        .submit-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .submit-btn span {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .message-box {
+            margin-top: 24px;
+            padding: 20px 24px;
+            border-radius: 14px;
+            text-align: center;
+            font-weight: 500;
+            animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message-box.success {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.25);
+            color: #4ade80;
+        }
+
+        .message-box.error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            color: #f87171;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 48px;
+            padding: 24px;
+        }
+
+        .footer-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .footer-heart {
+            color: var(--pink-glow);
+            animation: heartbeat 1.5s ease-in-out infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 40px 16px 60px;
+            }
+
+            .form-container {
+                padding: 32px 24px;
+                border-radius: 20px;
+            }
+
+            .logo-wrapper {
+                width: 80px;
+                height: 80px;
+                border-radius: 22px;
+            }
+
+            .logo-emoji {
+                font-size: 2.4rem;
+            }
+
+            .q-number {
+                width: 28px;
+                height: 28px;
+                font-size: 0.75rem;
+                border-radius: 8px;
+            }
+
+            .q-text {
+                font-size: 0.95rem;
+            }
+
+            input[type="text"],
+            textarea {
+                padding: 14px 16px;
+                font-size: 0.95rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="noise"></div>
+    
+    <div class="floating-elements">
+        <div class="float-item">🍣</div>
+        <div class="float-item">🍙</div>
+        <div class="float-item">🥢</div>
+        <div class="float-item">🍣</div>
+        <div class="float-item">🍱</div>
+        <div class="float-item">🍣</div>
+    </div>
+
+    <div class="container">
+        <header>
+            <div class="logo-wrapper">
+                <span class="logo-emoji">🍣</span>
+            </div>
+            <h1>SushiTools</h1>
+            <p class="tagline">Staff Application</p>
+        </header>
+
+        <div class="form-container">
+            <div class="form-intro">
+                <h2>Apply to Join Our Team</h2>
+                <p>Fill out the form below and we'll review your application. Good luck!</p>
+            </div>
+
+            <form id="applicationForm">
+                <div class="question-block">
+                    <div class="question-label">
+                        <span class="q-number">01</span>
+                        <span class="q-text">What is your Discord username?</span>
+                    </div>
+                    <input type="text" name="discord" placeholder="e.g. sushilover" required>
+                </div>
+
+                <div class="question-block">
+                    <div class="question-label">
+                        <span class="q-number">02</span>
+                        <span class="q-text">How old are you?</span>
+                    </div>
+                    <input type="text" name="age" placeholder="Your age" required>
+                </div>
+
+                <div class="question-block">
+                    <div class="question-label">
+                        <span class="q-number">03</span>
+                        <span class="q-text">How would you handle a situation where a user is repeatedly spamming in the server?</span>
+                    </div>
+                    <textarea name="spam" placeholder="Describe your approach..." required></textarea>
+                </div>
+
+                <div class="question-block">
+                    <div class="question-label">
+                        <span class="q-number">04</span>
+                        <span class="q-text">How would you approach a situation where a moderator is abusing their abilities?</span>
+                    </div>
+                    <textarea name="modAbuse" placeholder="Describe how you'd handle this..." required></textarea>
+                </div>
+
+                <div class="question-block">
+                    <div class="question-label">
+                        <span class="q-number">05</span>
+                        <span class="q-text">What is your time zone and how much time can you dedicate to the server?</span>
+                    </div>
+                    <textarea name="timezone" class="textarea-small" placeholder="e.g. EST, 3-4 hours daily" required></textarea>
+                </div>
+
+                <div class="question-block">
+                    <div class="question-label">
+                        <span class="q-number">06</span>
+                        <span class="q-text">What will you do if there are two members arguing?</span>
+                    </div>
+                    <textarea name="arguing" placeholder="Describe your conflict resolution approach..." required></textarea>
+                </div>
+
+                <div class="question-block">
+                    <div class="question-label">
+                        <span class="q-number">07</span>
+                        <span class="q-text">What action would you take if someone scammed a member?</span>
+                    </div>
+                    <textarea name="scam" placeholder="How would you handle scammers?" required></textarea>
+                </div>
+
+                <div class="question-block">
+                    <div class="question-label">
+                        <span class="q-number">08</span>
+                        <span class="q-text">Do you know any coding languages so you could help the owner with some stuff?</span>
+                    </div>
+                    <textarea name="coding" class="textarea-small" placeholder="List any programming languages you know..." required></textarea>
+                </div>
+
+                <div class="question-block">
+                    <div class="question-label">
+                        <span class="q-number">09</span>
+                        <span class="q-text">Do you have experience being a mod before? If yes, describe your experience.</span>
+                    </div>
+                    <textarea name="experience" placeholder="Tell us about your moderation experience..." required></textarea>
+                </div>
+
+                <div class="submit-section">
+                    <button type="submit" class="submit-btn">
+                        <span>Submit Application</span>
+                    </button>
+                </div>
+            </form>
+
+            <div id="messageBox"></div>
+        </div>
+
+        <footer>
+            <p class="footer-text">
+                Made with <span class="footer-heart">♥</span> for SushiTools
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        const form = document.getElementById('applicationForm');
+        const messageBox = document.getElementById('messageBox');
+        const submitBtn = form.querySelector('.submit-btn');
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            submitBtn.disabled = true;
+            submitBtn.querySelector('span').textContent = 'Submitting...';
+
+            const formData = new FormData(form);
+            
+            const embed = {
+                title: "🍣 New Staff Application",
+                color: 16723157,
+                thumbnail: {
+                    url: "https://em-content.zobj.net/source/twitter/376/sushi_1f363.png"
+                },
+                fields: [
+                    {
+                        name: "👤 Discord Username",
+                        value: formData.get('discord'),
+                        inline: true
+                    },
+                    {
+                        name: "🎂 Age",
+                        value: formData.get('age'),
+                        inline: true
+                    },
+                    {
+                        name: "\u200B",
+                        value: "───────────────────────"
+                    },
+                    {
+                        name: "📢 Handling Spam",
+                        value: formData.get('spam')
+                    },
+                    {
+                        name: "⚠️ Moderator Abuse",
+                        value: formData.get('modAbuse')
+                    },
+                    {
+                        name: "🕐 Timezone & Availability",
+                        value: formData.get('timezone')
+                    },
+                    {
+                        name: "🤝 Handling Arguments",
+                        value: formData.get('arguing')
+                    },
+                    {
+                        name: "🚫 Handling Scammers",
+                        value: formData.get('scam')
+                    },
+                    {
+                        name: "💻 Coding Languages",
+                        value: formData.get('coding')
+                    },
+                    {
+                        name: "📋 Moderation Experience",
+                        value: formData.get('experience')
+                    }
+                ],
+                timestamp: new Date().toISOString(),
+                footer: {
+                    text: "SushiTools Staff Applications",
+                    icon_url: "https://em-content.zobj.net/source/twitter/376/sushi_1f363.png"
+                }
+            };
+
+            try {
+                const response = await fetch('https://discord.com/api/webhooks/1455572829855809719/-SdHLrroiCoI4IglfgnlBAkZ_dr11HFAM7oJ-vTjjdkj6yXXmwlYIF6cNJYU80DZ2iR-', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: "SushiTools Applications",
+                        avatar_url: "https://em-content.zobj.net/source/twitter/376/sushi_1f363.png",
+                        embeds: [embed]
+                    })
+                });
+
+                if (response.ok) {
+                    messageBox.className = 'message-box success';
+                    messageBox.innerHTML = '🎉 Application submitted successfully! We\'ll review it soon.';
+                    form.reset();
+                } else {
+                    throw new Error('Failed to submit');
+                }
+            } catch (error) {
+                messageBox.className = 'message-box error';
+                messageBox.innerHTML = '❌ Something went wrong. Please try again later.';
+            }
+
+            submitBtn.disabled = false;
+            submitBtn.querySelector('span').textContent = 'Submit Application';
+        });
+    </script>
+</body>
+</html>
